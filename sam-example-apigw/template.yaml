@@ -5,13 +5,24 @@ Description: >
 
   Sample SAM Template for sam-example-apigw
 
+Parameters:
+  BucketName:
+    Type: String
+    Default: 'sam-example-apigw-smat'
+
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
     Timeout: 3
+    Environment:
+      Variables:
+        MAILFROM: matsuya@h01.itscom.net
+        SEQUENCETABLE: !Ref SequenceTable
+        USERTABLE: !Ref UserTable
+        SAVEBUCKET: matsuyatest-sam-demo
 
 Resources:
-  HelloWorldFunction:
+  UserRegistFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
       CodeUri: hello_world/
@@ -19,23 +30,87 @@ Resources:
       Runtime: python3.9
       Architectures:
         - x86_64
+      Role: arn:aws:iam::528163014577:role/example-lambda-role
       Events:
         HelloWorld:
-          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Type: HttpApi
           Properties:
-            Path: /hello
-            Method: get
+            Path: /userregist
+            Method: post
+            ApiId: !Ref MyHttpApi
+  MyHttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      CorsConfiguration: true
+      Domain:
+        DomainName: api.smat710.tk
+        CertificateArn: arn:aws:acm:ap-northeast-1:528163014577:certificate/47405301-9f43-4d12-b5b8-368b206f292b
+        EndpointConfiguration: REGIONAL
+        Route53:
+          HostedZoneId: Z0885897H6FS59VX1SAQ
+  S3FormBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    Properties:
+      BucketName: !Ref BucketName
+      AccessControl: PublicRead
+      WebsiteConfiguration:
+        IndexDocument: index.html
+        ErrorDocument: error.html
+  BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      PolicyDocument:
+        Id: MyPolicy
+        Version: 2012-10-17
+        Statement:
+          - Sid: PublicReadForGetBucketObjects
+            Effect: Allow
+            Principal: '*'
+            Action: 's3:GetObject'
+            Resource: !Join
+              - ''
+              - - 'arn:aws:s3:::'
+                - !Ref S3FormBucket
+                - /*
+      Bucket: !Ref S3FormBucket
+
+  UserTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    Properties:
+      TableName: user
+      # id列をキーとする
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: N
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 3
+        WriteCapacityUnits: 3
+  SequenceTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    Properties:
+      TableName: sequence
+      AttributeDefinitions:
+        - AttributeName: tablename
+          AttributeType: S
+      KeySchema:
+        - AttributeName: tablename
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 3
+        WriteCapacityUnits: 3
 
 Outputs:
-  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
-  # Find out more about other implicit resources you can reference within SAM
-  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
-  HelloWorldApi:
-    Description: "API Gateway endpoint URL for Prod stage for Hello World function"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
-  HelloWorldFunction:
-    Description: "Hello World Lambda Function ARN"
-    Value: !GetAtt HelloWorldFunction.Arn
-  HelloWorldFunctionIamRole:
-    Description: "Implicit IAM Role created for Hello World function"
-    Value: !GetAtt HelloWorldFunctionRole.Arn
+  MyFunctionArn:
+    Value: !GetAtt UserRegistFunction.Arn
+  MyFormBucketName:
+    Value: !Ref S3FormBucket
+  WebSiteURL:
+    Value: !GetAtt S3FormBucket.WebsiteURL
+  MySequenceTableName:
+    Value: !Ref SequenceTable
