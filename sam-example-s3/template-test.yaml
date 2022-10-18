@@ -1,0 +1,72 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: 'sam-example-s3
+
+  Sample SAM Template for sam-example-s3
+
+  '
+Globals:
+  Function:
+    Timeout: 3
+    Environment:
+      Variables:
+        OUTPUTBUCKET: matsuyatest-sam-sample2
+Resources:
+  HelloWorldFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://aws-sam-cli-managed-default-samclisourcebucket-17dag1qbzov3x/d9f5c0bd4be8bd055b694b7537196be5
+      Handler: app.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      Role: arn:aws:iam::528163014577:role/example-lambda-role
+      Layers:
+        - Ref: MyLayerPyminizip
+      Events:
+        S3Event:
+          Type: S3
+          Properties:
+            Bucket:
+              Ref: DummyBucket
+            Events: s3:ObjectCreated:*
+    Metadata:
+      SamResourceId: HelloWorldFunction
+  S3Permission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName:
+        Ref: HelloWorldFunction
+      Principal: s3.amazonaws.com
+      SourceAccount:
+        Ref: AWS::AccountId
+      SourceArn:
+        Fn::Sub: arn:aws:s3:::matsuyatest-sam-sample
+    Metadata:
+      SamResourceId: S3Permission
+  MyLayerPyminizip:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      ContentUri: s3://aws-sam-cli-managed-default-samclisourcebucket-17dag1qbzov3x/ec31426da4bbbf79287dc8d61814d20e
+      CompatibleRuntimes:
+        - python3.9
+    Metadata:
+      BuildMethod: python3.9
+      SamResourceId: MyLayerPyminizip
+  DummyBucket:
+    Type: AWS::S3::Bucket
+    Metadata:
+      SamResourceId: DummyBucket
+  # バケットの情報を追記
+  MyBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    Properties:
+      BucketName: matsuyatest-sam-sample1
+Outputs:
+  MyFunctionArn:
+    Value:
+      Fn::GetAtt:
+        - HelloWorldFunction
+        - Arn

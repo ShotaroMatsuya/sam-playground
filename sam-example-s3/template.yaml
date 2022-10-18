@@ -25,6 +25,13 @@ Resources:
       Role: arn:aws:iam::528163014577:role/example-lambda-role
       Layers:
         - !Ref MyLayerPyminizip
+      Events:
+        S3Event:
+          Type: S3
+          Properties:
+            Bucket: !Ref DummyBucket
+            Events: s3:ObjectCreated:*
+
   S3Permission:
     Type: AWS::Lambda::Permission
     Properties:
@@ -42,6 +49,9 @@ Resources:
         - python3.9
     Metadata:
       BuildMethod: python3.9
+  DummyBucket:
+    Type: AWS::S3::Bucket
+
 Outputs:
   MyFunctionArn:
     Value: !GetAtt HelloWorldFunction.Arn

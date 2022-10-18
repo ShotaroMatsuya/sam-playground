@@ -1,0 +1,9 @@
+[
+  {
+    "ResourceType": "AWS::S3::Bucket",
+    "LogicalResourceId": "MyBucket",
+    "ResourceIdentifier": {
+      "BucketName": "matsuyatest-sam-sample1"
+    }
+  }
+]
