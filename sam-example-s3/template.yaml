@@ -9,6 +9,9 @@ Description: >
 Globals:
   Function:
     Timeout: 3
+    Environment:
+      Variables:
+        OUTPUTBUCKET: matsuyatest-sam-sample2
 
 Resources:
   HelloWorldFunction:
