@@ -11,3 +11,11 @@ packagetype = "Zip"
 functions = ["HelloWorldFunction"]
 
 [layer_build_definitions]
+[layer_build_definitions.47e13eb5-5a9b-44cc-b570-2314b00762f0]
+layer_name = "MyLayerPyminizip"
+codeuri = "/Users/matsutanishoutarou/Movies/SAM-demo/sam-example-s3/mylayer-pyminizip"
+build_method = "python3.9"
+compatible_runtimes = ["python3.9"]
+architecture = "x86_64"
+manifest_hash = ""
+layer = "MyLayerPyminizip"

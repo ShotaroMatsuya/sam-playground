@@ -23,6 +23,8 @@ Resources:
       Architectures:
         - x86_64
       Role: arn:aws:iam::528163014577:role/example-lambda-role
+      Layers:
+        - !Ref MyLayerPyminizip
   S3Permission:
     Type: AWS::Lambda::Permission
     Properties:
@@ -31,6 +33,15 @@ Resources:
       Principal: s3.amazonaws.com
       SourceAccount: !Ref 'AWS::AccountId'
       SourceArn: !Sub arn:aws:s3:::matsuyatest-sam-sample
+  # レイヤーの作成
+  MyLayerPyminizip:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      ContentUri: 'mylayer-pyminizip/'
+      CompatibleRuntimes:
+        - python3.9
+    Metadata:
+      BuildMethod: python3.9
 Outputs:
   MyFunctionArn:
     Value: !GetAtt HelloWorldFunction.Arn

@@ -2,6 +2,7 @@ import os
 import tempfile
 
 import boto3
+import pyminizip
 
 
 def lambda_handler(event, context):
@@ -19,10 +20,15 @@ def lambda_handler(event, context):
         fp.write(response['Body'].read())
         fp.close()
 
+        # 暗号化
+        zipfilename = tempfile.mkstemp(suffix='.zip')[1]
+        os.chdir(tmpdir.name)
+        pyminizip.compress(localfilename, None, zipfilename, 'mypassword', 0)
+
         destbucketname = os.environ['OUTPUTBUCKET']
-        obj2 = s3.Object(destbucketname, filename)
+        obj2 = s3.Object(destbucketname, filename + '.zip')
         obj2.put(
-            Body=open(localfilename, 'rb')
+            Body=open(zipfilename, 'rb')
         )
         
         tmpdir.cleanup()
