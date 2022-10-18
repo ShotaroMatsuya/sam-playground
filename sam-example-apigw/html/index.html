@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- CSS only -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi"
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://code.jquery.com/jquery-3.6.1.min.js"
+      integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ="
+      crossorigin="anonymous"
+    ></script>
+    <script>
+      function onSubmit() {
+        var data = {
+          username: $('#username').val(),
+          email: $('#email').val(),
+        };
+        $.post('https://api.smat710.tk/userregist', JSON.stringify(data))
+          .done(function (data, textStatus, jqXHR) {
+            alert('送信完了');
+            $('#username').val('');
+            $('#email').val('');
+          })
+          .fail(function (jqXHR, textStatus, errorThrown) {
+            var err = [];
+            try {
+              err = $.parseJSON(jqXHR.responseText);
+            } catch (e) {}
+            alert('エラー発生' + err['error']);
+          });
+      }
+    </script>
+    <title>sam test</title>
+  </head>
+  <body>
+    <div class="container">
+      <h1>ユーザー登録</h1>
+      <div class="form-group">
+        <label for="username">名前</label>
+        <input type="text" class="form-control" id="username" />
+      </div>
+      <div class="form-group">
+        <label for="email">メールアドレス</label>
+        <input type="email" class="form-control" id="email" />
+      </div>
+      <button
+        id="submit"
+        class="btn btn-primary"
+        onclick="onSubmit(); return false;"
+      >
+        送信
+      </button>
+    </div>
+  </body>
+</html>
