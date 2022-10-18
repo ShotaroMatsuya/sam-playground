@@ -17,9 +17,9 @@ MAILFROM = os.environ['MAILFROM']
 
 
 def sendmail(to, subject, body):
-    client.send_email(
+    response = client.send_email(
         Source=MAILFROM,
-        ReplyToAddress=[MAILFROM],
+        ReplyToAddresses=[MAILFROM],
         Destination={
             'ToAddresses': [
                 to
@@ -50,7 +50,7 @@ def next_seq(table, tablename):
         ExpressionAttributeValues={
             ':val': 1
         },
-        ReturnValues='UPDATE_NEW'
+        ReturnValues='UPDATED_NEW'
     )
     return response['Attributes']['seq']
 
