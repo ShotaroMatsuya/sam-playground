@@ -29,17 +29,8 @@ Resources:
         S3Event:
           Type: S3
           Properties:
-            Bucket: !Ref DummyBucket
+            Bucket: !Ref MyBucket
             Events: s3:ObjectCreated:*
-
-  S3Permission:
-    Type: AWS::Lambda::Permission
-    Properties:
-      Action: 'lambda:InvokeFunction'
-      FunctionName: !Ref HelloWorldFunction
-      Principal: s3.amazonaws.com
-      SourceAccount: !Ref 'AWS::AccountId'
-      SourceArn: !Sub arn:aws:s3:::matsuyatest-sam-sample
   # レイヤーの作成
   MyLayerPyminizip:
     Type: AWS::Serverless::LayerVersion
@@ -49,8 +40,12 @@ Resources:
         - python3.9
     Metadata:
       BuildMethod: python3.9
-  DummyBucket:
+  # バケットの情報を記載
+  MyBucket:
     Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    Properties:
+      BucketName: matsuyatest-sam-sample1
 
 Outputs:
   MyFunctionArn:
