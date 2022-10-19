@@ -102,7 +102,7 @@ Resources:
             BucketName: !Ref S3Mailbody
         # SESを用いたメール送信
         - SESCrudPolicy:
-            IdentityName: ! MailAddress
+            IdentityName: !Ref MailAddress
       Events:
         SendmailEvent:
           Type: SQS

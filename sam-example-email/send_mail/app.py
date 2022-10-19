@@ -1,4 +1,3 @@
-import json
 import os
 
 import boto3
@@ -7,17 +6,18 @@ sqs = boto3.resource('sqs')
 s3 = boto3.resource('s3')
 dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table('mailaddress')
-client = boto3.client('sqs')
+client = boto3.client('ses')
 # メール送信元
 MAILFROM = os.environ['MAILADDRESS']
 
+
 # queueをうけとってmail送信
-def lambda_handler(event,context):
+def lambda_handler(event, context):
     for rec in event['Records']:
         email = rec['body']
         bucketname = rec['messageAttributes']['bucketname']['stringValue']
         filename = rec['messageAttributes']['filename']['stringValue']
-        username = rec['messageAttributes']['username']['string']
+        username = rec['messageAttributes']['username']['stringValue']
         
         obj = s3.Object(bucketname, filename)
         response = obj.get()
