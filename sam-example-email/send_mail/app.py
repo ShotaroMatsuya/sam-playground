@@ -1,7 +1,9 @@
 import os
 
 import boto3
+from aws_xray_sdk.core import patch_all
 
+patch_all()
 sqs = boto3.resource('sqs')
 s3 = boto3.resource('s3')
 dynamodb = boto3.resource('dynamodb')

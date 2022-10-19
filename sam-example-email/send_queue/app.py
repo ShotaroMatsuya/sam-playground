@@ -2,7 +2,10 @@ import json
 import os
 
 import boto3
+from aws_xray_sdk.core import patch_all
 from boto3.dynamodb.conditions import Key
+
+patch_all()
 
 
 def lambda_handler(event, context):

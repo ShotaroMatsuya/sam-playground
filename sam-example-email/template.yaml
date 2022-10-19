@@ -18,6 +18,7 @@ Parameters:
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
+    Tracing: Active
     Timeout: 3
     Environment:
       Variables:
@@ -73,6 +74,9 @@ Resources:
       Handler: app.lambda_handler
       Runtime: python3.9
       Policies:
+        # Xrayへ書き込む権限
+        - CloudWatchLogsFullAccess
+        - AWSXRayDaemonWriteAccess
         # DynamoDBテーブルへのCRUD権限
         - DynamoDBCrudPolicy:
             TableName: !Ref MailTable
@@ -101,6 +105,9 @@ Resources:
       Handler: app.lambda_handler
       Runtime: python3.9
       Policies:
+        # Xrayへ書き込む権限
+        - CloudWatchLogsFullAccess
+        - AWSXRayDaemonWriteAccess
         # DynamoDBテーブルへのCRUD権限
         - DynamoDBCrudPolicy:
             TableName: !Ref MailTable
@@ -124,6 +131,9 @@ Resources:
       Handler: app.lambda_handler
       Runtime: python3.9
       Policies:
+        # Xrayへ書き込む権限
+        - CloudWatchLogsFullAccess
+        - AWSXRayDaemonWriteAccess
         # DynamoDBテーブルへのCRUD権限
         - DynamoDBCrudPolicy:
             TableName: !Ref MailTable
