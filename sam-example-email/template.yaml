@@ -79,6 +79,13 @@ Resources:
         # queueへの送信権限
         - SQSSendMessagePolicy:
             QueueName: !GetAtt SendQueue.QueueName
+        - Statement:
+            - Sid: SQSGetUrlPolicy
+              Effect: Allow
+              Action:
+                - sqs:GetQueueUrl
+              Resource: !GetAtt SendQueue.Arn
+
       Events:
         BodyUploadEvent:
           Type: S3
