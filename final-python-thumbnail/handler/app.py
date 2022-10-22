@@ -31,7 +31,7 @@ def get_s3_image(bucket, key):
     imageContent = response["Body"].read()
 
     file = BytesIO(imageContent)
-    img = Image, open(file)
+    img = Image.open(file)
     return img
 
 
