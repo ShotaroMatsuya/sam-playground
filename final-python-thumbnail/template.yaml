@@ -55,6 +55,20 @@ Resources:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
       TableName: 'images-url-tables'
+
+  ListThumbnails:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: app.s3_get_thumbnail_urls
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref ImagesDynamoDbTable
+      Events:
+        ListThumbnailsEvent:
+          Type: Api
+          Properties:
+            Path: /images
+            Method: GET
 # Outputs:
 #   ThumbnailAPI:
 #     Description: 'API Gateway endpoint URL for Prod stage for Thumbnail function'

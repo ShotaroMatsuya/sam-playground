@@ -8,6 +8,6 @@ architecture = "x86_64"
 handler = "app.s3_thumbnail_generator"
 manifest_hash = ""
 packagetype = "Zip"
-functions = ["CreateThumbnailFunction"]
+functions = ["CreateThumbnailFunction", "ListThumbnails"]
 
 [layer_build_definitions]
