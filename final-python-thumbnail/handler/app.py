@@ -123,3 +123,27 @@ def s3_get_item(event, context):
         "body": json.dumps(item),
         "isBase64Encoded": False,
     }
+
+
+def s3_delete_item(event, context):
+    item_id = event["pathParameters"]["id"]
+
+    # Set the default error response
+    response = {
+        "statusCode": 500,
+        "body": f"An error occurred while deleting pos {item_id}",
+    }
+    table = dynamodb.Table(dbtable)
+    response = table.delete_item(Key={"id": item_id})
+    all_good_response = {"deleted": True, "itemDeletedId": item_id}
+
+    # If deletion is successful for post
+    if response["ResponseMetadata"]["HTTPStatusCode"] == 200:
+        response = {
+            "statusCode": 200,
+            "headers": {
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "*",
+            },
+            "body": json.dumps(all_good_response),
+        }

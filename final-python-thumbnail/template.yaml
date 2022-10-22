@@ -56,6 +56,20 @@ Resources:
         WriteCapacityUnits: 5
       TableName: 'images-url-tables'
 
+  DeleteThumbnail:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: app.s3_delete_item
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ImagesDynamoDbTable
+      Events:
+        DeleteThumbnailEvent:
+          Type: Api
+          Properties:
+            Path: /images/{id}
+            Method: DELETE
+
   GetThumbnail:
     Type: AWS::Serverless::Function
     Properties:
