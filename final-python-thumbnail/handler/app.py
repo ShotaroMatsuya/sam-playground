@@ -106,3 +106,20 @@ def s3_get_thumbnail_urls(event, context):
         "headers": {"Content-Type": "application/json"},
         "body": json.dumps(data),
     }
+
+
+def s3_get_item(event, context):
+    table = dynamodb.Table(dbtable)
+    response = table.get_item(Key={"id": event["pathParameters"]["id"]})
+
+    item = response["Item"]
+
+    return {
+        "statusCode": 200,
+        "headers": {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+        },
+        "body": json.dumps(item),
+        "isBase64Encoded": False,
+    }

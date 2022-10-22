@@ -56,6 +56,19 @@ Resources:
         WriteCapacityUnits: 5
       TableName: 'images-url-tables'
 
+  GetThumbnail:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: app.s3_get_item
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref ImagesDynamoDbTable
+      Events:
+        GetThumbnailThumbnailEvent:
+          Type: Api
+          Properties:
+            Path: /images/{id}
+            Method: GET
   ListThumbnails:
     Type: AWS::Serverless::Function
     Properties:
