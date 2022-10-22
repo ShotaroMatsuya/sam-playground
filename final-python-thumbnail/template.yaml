@@ -17,6 +17,8 @@ Globals:
       Variables:
         THUMBNAIL_SIZE: 128
         REGION_NAME: 'ap-northeast-1'
+    Layers:
+      - 'arn:aws:lambda:ap-northeast-1:770693421928:layer:Klayers-p39-pillow:1'
 Resources:
   CreateThumbnailFunction:
     Type: AWS::Serverless::Function
