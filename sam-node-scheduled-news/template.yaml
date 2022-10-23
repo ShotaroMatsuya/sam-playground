@@ -1,0 +1,132 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  sam-node-scheduled-news
+
+  Sample SAM Template for sam-node-scheduled-news
+
+Globals:
+  Function:
+    MemorySize: 128
+    Timeout: 100
+    Layers:
+      - !Ref NodeBaseLayer
+    Environment:
+      Variables:
+        SNS_TOPIC_ARN: !Ref NewsTopic
+        DYNAMODB_TABLE: !Ref Table
+        REGION_NAME: !Ref Region
+        API_KEY: !Ref NewsApiKey
+        API_ENDPOINT: 'https://3f2yzpffd3.execute-api.ap-northeast-1.amazonaws.com/Prod/news'
+Parameters:
+  Table:
+    Type: String
+    Default: News
+  Topic:
+    Type: String
+    Default: Happy-News
+  Region:
+    Type: String
+    Default: ap-northeast-1
+  NewsApiKey:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: 'sam-news-api-key'
+
+Resources:
+  FetchNewsEvent:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/handlers/
+      Handler: getNews.getNews
+      Runtime: nodejs16.x
+      Architectures:
+        - x86_64
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref Table
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - comprehend:*
+              Resource: '*'
+      Events:
+        HelloWorld:
+          Type: Api
+          Properties:
+            Path: /news
+            Method: get
+
+  SendEmailEvent:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/handlers/
+      Handler: app.scheduledEventLoggerHandler
+      Description: A Lambda Function that sends only good news to a subscribed user
+      Runtime: nodejs16.x
+      Architectures:
+        - x86_64
+      Policies:
+        - SNSCrudPolicy:
+            TopicName: !Ref Topic
+      Events:
+        CloudWatchEvent:
+          Type: Schedule
+          Properties:
+            Schedule: cron(0 15 * * ? *)
+
+  NewsTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: !Ref Topic
+
+  NewsSubscription:
+    Type: AWS::SNS::Subscription
+    Properties:
+      TopicArn: !Ref NewsTopic
+      Endpoint: matsuya@h01.itscom.net
+      Protocol: email
+      DeliveryPolicy:
+        healthyRetryPolicy:
+          numRetries: 20
+          minDelayTarget: 10
+          maxDelayTarget: 30
+          numMinDelayRetries: 3
+          numMaxDelayRetries: 17
+          numNoDelayRetries: 0
+          backoffFunction: exponential
+
+  NodeBaseLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      Description: Base Layer for Node.js
+      LayerName: node-base-layer
+      ContentUri: node-base-layer/
+      CompatibleRuntimes:
+        - nodejs16.x
+
+  NodeBaseLayerPermission:
+    Type: AWS::Lambda::LayerVersionPermission
+    Properties:
+      Action: lambda:GetLayerVersion
+      LayerVersionArn: !Ref NodeBaseLayer
+      Principal: !Ref AWS::AccountId
+
+  NewsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+      TableName: !Ref Table
+
+Outputs:
+  ScrapingNewsFeedApi:
+    Description: 'API Gateway endpoint URL for Prod stage for getArticles function'
+    Value: !Sub 'https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/news'
