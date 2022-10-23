@@ -1,0 +1,38 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  ses-contact-us
+
+  Sample SAM Template for ses-contact-us
+
+Globals:
+  Function:
+    Timeout: 3
+    MemorySize: 128
+    Runtime: nodejs16.x
+    Architectures:
+      - x86_64
+
+Resources:
+  CreateContactFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: handler/
+      Handler: app.createContact
+      Policies:
+        - SESCrudPolicy:
+            IdentityName: matsuya@h01.itscom.net
+      Events:
+        CreateContact:
+          Type: Api
+          Properties:
+            Path: /contact-us
+            Method: post
+
+Outputs:
+  CreateContactApi:
+    Description: 'API Gateway endpoint URL for Prod stage for Hello World function'
+    Value: !Sub 'https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/contact-us/'
+  CreateContactFunction:
+    Description: 'Create Contact Lambda Function ARN'
+    Value: !GetAtt CreateContactFunction.Arn

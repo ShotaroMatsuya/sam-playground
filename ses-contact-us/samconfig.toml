@@ -1,0 +1,10 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "ses-contact-us"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-17dag1qbzov3x"
+s3_prefix = "ses-contact-us"
+region = "ap-northeast-1"
+capabilities = "CAPABILITY_IAM"
+image_repositories = []
